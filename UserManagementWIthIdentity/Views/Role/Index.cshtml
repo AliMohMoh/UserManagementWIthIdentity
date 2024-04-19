@@ -1,0 +1,38 @@
+﻿﻿@using Microsoft.AspNetCore.Identity;
+@model IEnumerable<IdentityRole>
+@using UserManagementWIthIdentity.Contants
+
+@{
+    ViewData["Title"] = "Roles";
+    var index = 1;
+}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Roles</h1>
+</div>
+
+<partial name="_RoleForm" model="new RoleFormViewModel()" />
+<table class="table table-striped mt-4">
+    <thead>
+        <tr class="bg-primary text-white">
+            <th>#</th>
+            <th>Role Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model)
+        {
+            <tr>
+                <td>@index</td>
+                <td>@role.Name</td>
+                <td>
+                    <a class="btn btn-primary" asp-action="ManagePermissions" asp-route-roleId="@role.Id">Manage Permissions</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
