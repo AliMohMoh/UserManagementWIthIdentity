@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using UserManagementWIthIdentity.Data;
 using UserManagementWIthIdentity.Filters;
 
@@ -42,6 +43,29 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        await UserManagementWIthIdentity.Seeds.DefaultRoles.SeedAsync(roleManager);
+        await UserManagementWIthIdentity.Seeds.DefaultUsers.SeedBasicUserAsync(userManager);
+        await UserManagementWIthIdentity.Seeds.DefaultUsers.SeedSuperAdminUserAsync(userManager, roleManager);
+
+        logger.LogInformation("Data seeded");
+        logger.LogInformation("Application Started");
+    }
+    catch (System.Exception ex)
+    {
+        logger.LogWarning(ex, "An error occurred while seeding data");
+    }
 }
 
 app.UseHttpsRedirection();
